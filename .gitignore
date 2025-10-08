@@ -1,0 +1,12 @@
+# Ignora a pasta node_modules
+node_modules/
+
+# Ignora arquivos de log do npm
+npm-debug.log*
+
+# Ignora variáveis de ambiente
+.env
+
+# Ignora arquivos de sistema
+.DS_Store
+Thumbs.db
