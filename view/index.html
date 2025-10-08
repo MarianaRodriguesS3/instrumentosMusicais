@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrumentos Musicais</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <form>
+        <section id="cadastro">
+            <fieldset>
+                <h1>Instrumentos Musicais</h1>
+                <p>Escolha seu Instrumento Musical:</p>
+                <label><input type="radio" name="instrumento" value="Guitarra"> Guitarra</label>
+                <label><input type="radio" name="instrumento" value="Baixo"> Baixo</label>
+                <label><input type="radio" name="instrumento" value="Violão"> Violão</label>
+                <label><input type="radio" name="instrumento" value="Bateria"> Bateria</label>
+                <label><input type="radio" name="instrumento" value="Piano"> Piano</label>
+                <label><input type="radio" name="instrumento" value="Violino"> Violino</label>
+
+                <p>Escolha a Quantidade:</p>
+                <label></label><input type="radio" name="quantidade" value="1"> 1</label>
+                <label><input type="radio" name="quantidade" value="2"> 2</label>
+                <label><input type="radio" name="quantidade" value="3"> 3</label>
+                <label><input type="radio" name="quantidade" value="4"> 4</label>
+                <label><input type="radio" name="quantidade" value="5"> 5</label>
+
+                <p>Canhoto/Destro:</p>
+                <label><input type="radio" name="tipo" value="canhoto"> Canhoto</label>
+                <label><input type="radio" name="tipo" value="destro"> Destro</label><br>
+
+                <input type="button" onclick="incluirInstrumentos()" value="Incluir Instrumento"><br>
+                <table id="tabInstrumentos">
+                    <!--<thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Instrumento</th>
+                            <th>Quantidade</th>
+                            <th>Canhoto/Destro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>-->
+                </table>
+            </fieldset>
+        </section>
+    </form>
+
+    <script src="index.js"></script>
+</body>
+</html>
