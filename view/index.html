@@ -1,52 +1,114 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Instrumentos Musicais</title>
-    <link rel="stylesheet" href="index.css">
+
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
 </head>
 <body>
-    <form>
-        <section id="cadastro">
-            <fieldset>
-                <h1>Instrumentos Musicais</h1>
-                <p>Escolha seu Instrumento Musical:</p>
-                <label><input type="radio" name="instrumento" value="Guitarra"> Guitarra</label>
-                <label><input type="radio" name="instrumento" value="Baixo"> Baixo</label>
-                <label><input type="radio" name="instrumento" value="Violão"> Violão</label>
-                <label><input type="radio" name="instrumento" value="Bateria"> Bateria</label>
-                <label><input type="radio" name="instrumento" value="Piano"> Piano</label>
-                <label><input type="radio" name="instrumento" value="Violino"> Violino</label>
+    <div class="container">
+        <h3 class="center-align">Instrumentos Musicais</h3>
 
-                <p>Escolha a Quantidade:</p>
-                <label></label><input type="radio" name="quantidade" value="1"> 1</label>
-                <label><input type="radio" name="quantidade" value="2"> 2</label>
-                <label><input type="radio" name="quantidade" value="3"> 3</label>
-                <label><input type="radio" name="quantidade" value="4"> 4</label>
-                <label><input type="radio" name="quantidade" value="5"> 5</label>
+        <form id="formInstrumentos" class="section">
+            <p><strong>Escolha seu Instrumento Musical:</strong></p>
+            <p>
+                <label>
+                    <input name="instrumento" type="radio" value="Guitarra" />
+                    <span>Guitarra</span>
+                </label>
+                <label>
+                    <input name="instrumento" type="radio" value="Baixo" />
+                    <span>Baixo</span>
+                </label>
+                <label>
+                    <input name="instrumento" type="radio" value="Violão" />
+                    <span>Violão</span>
+                </label>
+                <label>
+                    <input name="instrumento" type="radio" value="Bateria" />
+                    <span>Bateria</span>
+                </label>
+                <label>
+                    <input name="instrumento" type="radio" value="Piano" />
+                    <span>Piano</span>
+                </label>
+                <label>
+                    <input name="instrumento" type="radio" value="Violino" />
+                    <span>Violino</span>
+                </label>
+            </p>
 
-                <p>Canhoto/Destro:</p>
-                <label><input type="radio" name="tipo" value="canhoto"> Canhoto</label>
-                <label><input type="radio" name="tipo" value="destro"> Destro</label><br>
+            <p><strong>Escolha a Quantidade:</strong></p>
+            <p>
+                <label>
+                    <input name="quantidade" type="radio" value="1" />
+                    <span>1</span>
+                </label>
+                <label>
+                    <input name="quantidade" type="radio" value="2" />
+                    <span>2</span>
+                </label>
+                <label>
+                    <input name="quantidade" type="radio" value="3" />
+                    <span>3</span>
+                </label>
+                <label>
+                    <input name="quantidade" type="radio" value="4" />
+                    <span>4</span>
+                </label>
+                <label>
+                    <input name="quantidade" type="radio" value="5" />
+                    <span>5</span>
+                </label>
+            </p>
 
-                <input type="button" onclick="incluirInstrumentos()" value="Incluir Instrumento"><br>
-                <table id="tabInstrumentos">
-                    <!--<thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Instrumento</th>
-                            <th>Quantidade</th>
-                            <th>Canhoto/Destro</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>-->
-                </table>
-            </fieldset>
-        </section>
-    </form>
+            <p><strong>Canhoto/Destro:</strong></p>
+            <p>
+                <label>
+                    <input name="tipo" type="radio" value="canhoto" />
+                    <span>Canhoto</span>
+                </label>
+                <label>
+                    <input name="tipo" type="radio" value="destro" />
+                    <span>Destro</span>
+                </label>
+            </p>
 
+            <button
+                class="btn waves-effect waves-light"
+                type="button"
+                onclick="incluirInstrumentos()"
+            >
+                Incluir Instrumento
+                <i class="material-icons right">send</i>
+            </button>
+        </form>
+
+        <table class="striped responsive-table">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Instrumento</th>
+                    <th>Quantidade</th>
+                    <th>Canhoto/Destro</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabInstrumentos"></tbody>
+        </table>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- Seu JS -->
     <script src="index.js"></script>
 </body>
 </html>

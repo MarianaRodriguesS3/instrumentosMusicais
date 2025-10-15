@@ -1,131 +1,187 @@
+document.addEventListener('DOMContentLoaded', () => {
+    M.AutoInit();
+    carregaTabela();
+});
+
 function carregaTabela(){
-    console.log('Carregando tabelas...')
-    const req = new XMLHttpRequest()
-    req.open('GET','http://localhost:8080/instrumentosMusicais')
+    const req = new XMLHttpRequest();
+    req.open('GET','http://localhost:8080/instrumentosMusicais');
 
     req.onload = () => {
-        const instrumento=JSON.parse(req.responseText)
-        console.log(instrumento)
-        var tab = '<tr><th>id</th><th>Instrumento</th><th>Quantidade</th><th colspan="3">Canhoto/Destro</th></tr>';
-        instrumento.forEach(p => {
-            pJson=JSON.stringify(p)
-            const tipo = p.tipo;
+        if(req.status !== 200){
+            M.toast({html: 'Erro ao carregar a tabela'});
+            return;
+        }
 
-            tab += `<tr id=linha${p.id}>
-            <td>${p.id}</td>
-            <td>${p.instrumento}</td>
-            <td>${p.quantidade}</td>
-            <td>${tipo}</td>
-            <td><button onclick=apagarInstrumento(${p.id})>apagar</button></td>
-            <td class='semBorda'><button onclick=abaAlterar('${pJson}')>editar</button></td></tr>`
+        const instrumentos = JSON.parse(req.responseText);
+        let tab = '';
+        instrumentos.forEach(p => {
+            // Substituir aspas simples para evitar conflito no onclick
+            const pJson = JSON.stringify(p).replace(/'/g, "&apos;");
+            tab += `<tr id="linha${p.id}">
+                <td>${p.id}</td>
+                <td>${p.instrumento}</td>
+                <td>${p.quantidade}</td>
+                <td>${p.tipo}</td>
+                <td>
+                    <button class="btn red lighten-1 waves-effect waves-light" title="Apagar" onclick="apagarInstrumento(${p.id})">
+                        <i class="material-icons">delete</i>
+                    </button>
+                    <button class="btn blue lighten-1 waves-effect waves-light" title="Editar" onclick="abaAlterar('${pJson}')">
+                        <i class="material-icons">edit</i>
+                    </button>
+                </td>
+            </tr>`;
         });
+        document.getElementById('tabInstrumentos').innerHTML = tab;
+    };
 
-        document.getElementById('tabInstrumentos').innerHTML=tab;
-    }
+    req.onerror = () => {
+        M.toast({html: 'Erro na comunicação com o servidor'});
+    };
 
-    req.send()
+    req.send();
 }
 
-// insere um instrumento no banco de dados
 function incluirInstrumentos() {
-    const instrumentoSelecionado = document.querySelector('input[name="instrumento"]:checked');
-    const quantidadeSelecionada = document.querySelector('input[name="quantidade"]:checked');
-    const tipoSelecionado = document.querySelector('input[name="tipo"]:checked');
+    const instrumento = document.querySelector('input[name="instrumento"]:checked');
+    const quantidade = document.querySelector('input[name="quantidade"]:checked');
+    const tipo = document.querySelector('input[name="tipo"]:checked');
 
-    // Verifica se todas as opções foram selecionadas
-    if (!instrumentoSelecionado || !quantidadeSelecionada || !tipoSelecionado) {
-        alert('Por favor, selecione um instrumento, uma quantidade e uma opção de canhoto/destro.');
+    if (!instrumento) {
+        M.toast({html: 'Selecione um instrumento musical'});
+        return;
+    }
+    if (!quantidade) {
+        M.toast({html: 'Selecione a quantidade'});
+        return;
+    }
+    if (!tipo) {
+        M.toast({html: 'Selecione canhoto ou destro'});
         return;
     }
 
     const novoInstrumento = {
-        'instrumento': instrumentoSelecionado.value,
-        'quantidade': parseInt(quantidadeSelecionada.value),
-        'tipo': tipoSelecionado.value,
+        instrumento: instrumento.value,
+        quantidade: parseInt(quantidade.value),
+        tipo: tipo.value
     };
-
-    console.log('incluir registro: ', novoInstrumento);
 
     const req = new XMLHttpRequest();
-    req.open('POST', 'http://localhost:8080/instrumentosMusicais/');
-    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.onload = () => {
-        alert('Instrumento incluído');
-        // Limpa as seleções após a inclusão
-        document.querySelectorAll('input[name="instrumento"]').forEach(radio => radio.checked = false);
-        document.querySelectorAll('input[name="quantidade"]').forEach(radio => radio.checked = false);
-        document.querySelectorAll('input[name="tipo"]').forEach(radio => radio.checked = false);
+    req.open('POST', 'http://localhost:8080/instrumentosMusicais');
+    req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
-        carregaTabela();
+    req.onload = () => {
+        if (req.status === 200) {
+            M.toast({html: 'Instrumento incluído com sucesso!'});
+            carregaTabela();
+            // Limpa seleção
+            document.querySelectorAll('input[name="instrumento"]').forEach(i => i.checked = false);
+            document.querySelectorAll('input[name="quantidade"]').forEach(i => i.checked = false);
+            document.querySelectorAll('input[name="tipo"]').forEach(i => i.checked = false);
+        } else {
+            M.toast({html: 'Erro ao incluir instrumento'});
+            console.error(req.responseText);
+        }
     };
+
+    req.onerror = () => {
+        M.toast({html: 'Erro na comunicação com o servidor'});
+    };
+
     req.send(JSON.stringify(novoInstrumento));
-}
-
-//apaga um registro
-function apagarInstrumento(id){
-
-    console.log('apagar registro : '+id)
-
-    const req = new XMLHttpRequest()
-    req.open('DELETE','http://localhost:8080/instrumentosMusicais/'+id)
-    req.onload = () => { 
-        alert('Registro apagado')
-        carregaTabela();
-    }
-    req.send()
-}
-
-function alterarInstrumentos(id) {
-    const instrumentoAlterado = {
-        id: id,
-        instrumento: document.querySelector(`input[name="instrumento"]:checked`).value,
-        quantidade: document.querySelector(`input[name="quantidade"]:checked`).value,
-        tipo: document.querySelector(`input[name="tipo"]:checked`).value,
-    };
-    
-    const req = new XMLHttpRequest();
-    req.open('PUT', `http://localhost:8080/instrumentosMusicais/${id}`);
-    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.onload = () => {
-        alert('Registro Alterado');
-        carregaTabela();
-    };
-    req.send(JSON.stringify(instrumentoAlterado));
 }
 
 function abaAlterar(p) {
     const instrumentoAlt = JSON.parse(p);
+    const id = instrumentoAlt.id;
 
     const formAlt = `
-        <td>${instrumentoAlt.id}</td>
+        <td>${id}</td>
         <td>
-            <label><input type="radio" name="instrumento" value="Guitarra" ${instrumentoAlt.instrumento === 'Guitarra' ? 'checked' : ''}> Guitarra</label>
-            <label><input type="radio" name="instrumento" value="Baixo" ${instrumentoAlt.instrumento === 'Baixo' ? 'checked' : ''}> Baixo</label>
-            <label><input type="radio" name="instrumento" value="Violão" ${instrumentoAlt.instrumento === 'Violão' ? 'checked' : ''}> Violão</label>
-            <label><input type="radio" name="instrumento" value="Bateria" ${instrumentoAlt.instrumento === 'Bateria' ? 'checked' : ''}> Bateria</label>
-            <label><input type="radio" name="instrumento" value="Piano" ${instrumentoAlt.instrumento === 'Piano' ? 'checked' : ''}> Piano</label>
-            <label><input type="radio" name="instrumento" value="Violino" ${instrumentoAlt.instrumento === 'Violino' ? 'checked' : ''}> Violino</label>
+            <label><input type="radio" name="instrumento" value="Guitarra" ${instrumentoAlt.instrumento === 'Guitarra' ? 'checked' : ''} /><span>Guitarra</span></label>
+            <label><input type="radio" name="instrumento" value="Baixo" ${instrumentoAlt.instrumento === 'Baixo' ? 'checked' : ''} /><span>Baixo</span></label>
+            <label><input type="radio" name="instrumento" value="Violão" ${instrumentoAlt.instrumento === 'Violão' ? 'checked' : ''} /><span>Violão</span></label>
+            <label><input type="radio" name="instrumento" value="Bateria" ${instrumentoAlt.instrumento === 'Bateria' ? 'checked' : ''} /><span>Bateria</span></label>
+            <label><input type="radio" name="instrumento" value="Piano" ${instrumentoAlt.instrumento === 'Piano' ? 'checked' : ''} /><span>Piano</span></label>
+            <label><input type="radio" name="instrumento" value="Violino" ${instrumentoAlt.instrumento === 'Violino' ? 'checked' : ''} /><span>Violino</span></label>
         </td>
         <td>
-            <label><input type="radio" name="quantidade" value="1" ${instrumentoAlt.quantidade == 1 ? 'checked' : ''}> 1</label>
-            <label><input type="radio" name="quantidade" value="2" ${instrumentoAlt.quantidade == 2 ? 'checked' : ''}> 2</label>
-            <label><input type="radio" name="quantidade" value="3" ${instrumentoAlt.quantidade == 3 ? 'checked' : ''}> 3</label>
-            <label><input type="radio" name="quantidade" value="4" ${instrumentoAlt.quantidade == 4 ? 'checked' : ''}> 4</label>
-            <label><input type="radio" name="quantidade" value="5" ${instrumentoAlt.quantidade == 5 ? 'checked' : ''}> 5</label>
+            <label><input type="radio" name="quantidade" value="1" ${instrumentoAlt.quantidade == 1 ? 'checked' : ''} /><span>1</span></label>
+            <label><input type="radio" name="quantidade" value="2" ${instrumentoAlt.quantidade == 2 ? 'checked' : ''} /><span>2</span></label>
+            <label><input type="radio" name="quantidade" value="3" ${instrumentoAlt.quantidade == 3 ? 'checked' : ''} /><span>3</span></label>
+            <label><input type="radio" name="quantidade" value="4" ${instrumentoAlt.quantidade == 4 ? 'checked' : ''} /><span>4</span></label>
+            <label><input type="radio" name="quantidade" value="5" ${instrumentoAlt.quantidade == 5 ? 'checked' : ''} /><span>5</span></label>
         </td>
         <td>
-            <label><input type="radio" name="tipo" value="canhoto" ${instrumentoAlt.canhoto === 'canhoto' ? 'checked' : ''}> Canhoto</label>
-            <label><input type="radio" name="tipo" value="destro" ${instrumentoAlt.canhoto === 'destro' ? 'checked' : ''}> Destro</label>
+            <label><input type="radio" name="tipo" value="canhoto" ${instrumentoAlt.tipo === 'canhoto' ? 'checked' : ''} /><span>Canhoto</span></label>
+            <label><input type="radio" name="tipo" value="destro" ${instrumentoAlt.tipo === 'destro' ? 'checked' : ''} /><span>Destro</span></label>
         </td>
         <td>
-            <input type="button" value="Salvar Alterações" onclick="alterarInstrumentos(${instrumentoAlt.id})">
-            <input type="button" value="Cancelar" onclick="carregaTabela()">
+            <button class="btn green waves-effect waves-light" onclick="alterarInstrumentos(${id})">Salvar Alterações</button>
+            <button class="btn grey lighten-1 waves-effect waves-light" onclick="carregaTabela()">Cancelar</button>
         </td>`;
 
-    const linha = document.getElementById('linha' + instrumentoAlt.id);
+    const linha = document.getElementById('linha' + id);
     linha.innerHTML = formAlt;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    carregaTabela();
-});
+function alterarInstrumentos(id) {
+    const linha = document.getElementById('linha' + id);
+
+    const instrumento = linha.querySelector(`input[name="instrumento"]:checked`);
+    const quantidade = linha.querySelector(`input[name="quantidade"]:checked`);
+    const tipo = linha.querySelector(`input[name="tipo"]:checked`);
+
+    if (!instrumento || !quantidade || !tipo) {
+        M.toast({html: 'Por favor, selecione todos os campos antes de salvar.'});
+        return;
+    }
+
+    const instrumentoAlterado = {
+        id: id,
+        instrumento: instrumento.value,
+        quantidade: parseInt(quantidade.value),
+        tipo: tipo.value,
+    };
+
+    const req = new XMLHttpRequest();
+    req.open('PUT', `http://localhost:8080/instrumentosMusicais/${id}`);
+    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    req.onload = () => {
+        if (req.status === 200) {
+            M.toast({html: 'Registro alterado com sucesso!'});
+            carregaTabela();
+        } else {
+            M.toast({html: 'Erro ao alterar registro'});
+            console.error(req.responseText);
+        }
+    };
+    req.onerror = () => {
+        M.toast({html: 'Erro na comunicação com o servidor'});
+    };
+    req.send(JSON.stringify(instrumentoAlterado));
+}
+
+function apagarInstrumento(id){
+    if(!confirm('Confirma apagar este instrumento?')) return;
+
+    const req = new XMLHttpRequest();
+    req.open('DELETE', `http://localhost:8080/instrumentosMusicais/${id}`);
+
+    req.onload = () => {
+        if(req.status === 200){
+            M.toast({html: 'Instrumento apagado com sucesso!'});
+            carregaTabela();
+        } else {
+            M.toast({html: 'Erro ao apagar instrumento'});
+            console.error(req.responseText);
+        }
+    };
+
+    req.onerror = () => {
+        M.toast({html: 'Erro na comunicação com o servidor'});
+    };
+
+    req.send();
+}
