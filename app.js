@@ -1,4 +1,5 @@
 const express = require("express")
+const cors = require('cors')
 const mysql = require('mysql2');
 
 const contrInstrumento = require("./controllers/instrumento.js")
@@ -10,7 +11,10 @@ const connection = mysql.createConnection({
   database: 'instrumentosMusicais',
 });
 
-const app=express()
+const app = express()
+
+app.use(cors()) 
+
 app.use(express.static('view'))
 app.use(express.json())
 app.get("/",(req,res)=>{res.sendFile(__dirname+"/view/index.html")})
