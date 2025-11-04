@@ -49,13 +49,13 @@
 
         <table class="striped responsive-table">
             <thead>
-                <tr>
+                <!-- <tr>
                     <th>id</th>
                     <th>Instrumento</th>
                     <th>Quantidade</th>
                     <th>Canhoto/Destro</th>
                     <th>Ações</th>
-                </tr>
+                </tr> -->
             </thead>
             <tbody id="tabInstrumentos"></tbody>
         </table>
